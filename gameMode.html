@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+  margin: 0;
+  overflow: hidden;
+  background: #222;
+}
+
+#player {
+  width: 50px;
+  height: 50px;
+  border-radius: 50px;
+  background: dodgerblue;
+  position: absolute;
+  left: 100px;
+  top: 100px;
+}
+
+.enemy {
+  width: 50px;
+  height: 50px;
+  border-radius: 50px;
+  background: crimson;
+  position: absolute;
+}
+
+.enemy img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hp {
+  position: absolute;
+  color: white;
+  font-size: 12px;
+}
+
+.youWinText {
+  color: white;
+  font-weight: bold;
+  font-size: 50px;
+  margin-left: 500px;
+  margin-top: 100px;
+}
+
+.joshe-picture {
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
+  }
+
+</style>
+</head>
+<body>
+  <img src="photo/school-map.png.png"></image>
+
+  <audio id="background-music">
+    <source src="audio/background.mp3" type="audio/mpeg">
+  </audio>
+
+  <audio id="yey-music">
+    <source src="audio/yey.mp3" type="audio/mpeg">
+  </audio>
+
+<div id="player"><img class="joshe-picture" src="photo/joshe.jpg" ></div>
+
+<button id="playButton">play music</button>
+<button id="pauseButton">Pause music</button>
+
+<div class="hit"></div>
+<div class="result"></div>
+
+<script>
+  const audio = document.getElementById("background-music");
+  const playBtn = document.getElementById("playButton");
+  const yeyAudio = document.getElementById("yey-music");
+
+  audio.play();
+
+  document.body.addEventListener("keydown", () => {
+    audio.play();
+  });
+
+  
+  document.body.addEventListener("keyup", () => {
+    //audio.pause();
+  });
+
+
+const player = document.getElementById("player");
+
+let playerX = 100;
+let playerY = 100;
+const speed = 4;
+
+const keys = {};
+
+const enemy = {
+  x: 400,
+  y: 200,
+  hp: 5
+};
+
+const enemyDiv = document.createElement("img");
+enemyDiv.src = 'photo/enemy.jpg'
+enemyDiv.className = "enemy";
+document.body.appendChild(enemyDiv);
+
+const hpText = document.createElement("div");
+hpText.className = "hp";
+document.body.appendChild(hpText);
+
+document.addEventListener("keydown", e => {
+  keys[e.key.toLowerCase()] = true;
+
+  if (e.code === "Space") {
+    attack();
+  }
+});
+
+document.addEventListener("keyup", e => {
+  keys[e.key.toLowerCase()] = false;
+});
+
+function attack() {
+  const dx = enemy.x - playerX;
+  const dy = enemy.y - playerY;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  if (distance < 80 && enemy.hp > 0) {
+    enemy.hp--;
+    console.log("Hit!");
+
+    if (enemy.hp <= 0) {
+      enemyDiv.remove();
+      hpText.remove();
+      console.log("Enemy defeated!");
+      document.querySelector('.result')
+        .innerHTML = '<p class="youWinText">You Scaped Gay Boss!</p>'
+      yeyAudio.play();  
+    }
+  }
+}
+
+function update() {
+  // Player movement
+  if (keys.w) playerY -= speed;
+  if (keys.s) playerY += speed;
+  if (keys.a) playerX -= speed;
+  if (keys.d) playerX += speed;
+
+  // Enemy AI
+  if (enemy.hp > 0) {
+    const dx = playerX - enemy.x;
+    const dy = playerY - enemy.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance > 5) {
+      enemy.x += (dx / distance) * 1.5;
+      enemy.y += (dy / distance) * 1.5;
+    }
+
+    enemyDiv.style.left = enemy.x + "px";
+    enemyDiv.style.top = enemy.y + "px";
+
+    hpText.textContent = "HP: " + enemy.hp;
+    hpText.style.left = enemy.x + "px";
+    hpText.style.top = (enemy.y - 20) + "px";
+  }
+
+  player.style.left = playerX + "px";
+  player.style.top = playerY + "px";
+
+  requestAnimationFrame(update);
+}
+
+update();
+</script>
+
+</body>
+</html>
